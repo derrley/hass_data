@@ -1,0 +1,32 @@
+blueprint:
+  name: Dim a light
+  description: >-
+    A script that dims a light (presumably until it is killed). Use this in
+    response to a button press (or, more likely, a button press-and-hold). Kill
+    it in response to a button release.
+  domain: script
+  input:
+    light:
+      name: Light to dim
+      selector:
+        entity:
+          domain: light
+
+mode: restart
+
+variables:
+  light: !input light
+  increment: "{{ -10 if states(light) == 'on' else 10 }}"
+  terminal: "{{ 0 if states(light) == 'on' else 255 }}"
+
+sequence:
+  - repeat:
+      sequence:
+        - service: light.turn_on
+          target:
+            entity_id: !input light
+          data:
+            brightness_step: "{{ increment }}"
+        - delay:
+            milliseconds: 250
+      until: "{{ state_attr(light, 'brightness') == terminal }}"
