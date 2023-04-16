@@ -205,7 +205,7 @@ action:
       data:
         option: "{{ 'Red' if states(trigger.entity_id) == 'off' else 'Blue' if (state_attr(trigger.entity_id, 'brightness') or 255) < 127 else 'Green' }}"
     - repeat:
-        for_each: "{{ state_attr(main_light, 'entity_id') or [] }}"
+        for_each: "{{ (state_attr(main_light, 'entity_id') or [])[:4] }}"
         sequence:
         - service: input_select.select_option
           target:
@@ -227,6 +227,7 @@ action:
         entity_id: "{{ button_vars[switch_button].scene }}"
       data: "{{ button_vars[switch_button].scene_on_data }}"
 
+max: 25
 mode: queued
 trace:
   stored_traces: 20
