@@ -102,6 +102,10 @@ variables:
   switch_press: "{{ trigger.event.data.device_id == switch if trigger.platform == 'event' else None}}"
   switch_button: "{{ trigger.event.data.property_key if trigger.platform == 'event' else None}}"
 
+  light_on_data:
+    brightness: 255
+    color_temp_kelvin: 2900
+
   input_select_changed: "{{ trigger.entity_id.startswith('input_select') if trigger.platform == 'state' }}"
 
   # Variables used in executing this automation, keyed on the button ID.
@@ -113,18 +117,24 @@ variables:
   button_vars:
     '005':
       light: "{{ main_light }}"
+      scene: "{{ main_light }}"
+      scene_on_data: "{{ light_on_data }}"
     '001':
       light: "{{ (state_attr(main_light, 'entity_id') or [])[0:1] }}"
       scene: !input top_left_scene
+      scene_on_data: {}
     '002':
       light: "{{ (state_attr(main_light, 'entity_id') or [])[1:2] }}"
       scene: !input top_right_scene
+      scene_on_data: {}
     '003':
       light: "{{ (state_attr(main_light, 'entity_id') or [])[2:3] }}"
       scene: !input bottom_left_scene
+      scene_on_data: {}
     '004':
       light: "{{ (state_attr(main_light, 'entity_id') or [])[3:4] }}"
       scene: !input bottom_right_scene
+      scene_on_data: {}
 
   # Input selects mapped to light group index values.
   input_selects:
@@ -208,15 +218,14 @@ action:
     - service: light.toggle
       target:
         entity_id: "{{ button_vars[switch_button].light }}"
-      data:
-        brightness: 255
-        color_temp_kelvin: 2900
+      data: "{{ light_on_data }}"
 
   - conditions: "{{ switch_press and double_press }}"
     sequence:
-    - service: scene.turn_on
+    - service: homeassistant.turn_on
       target:
         entity_id: "{{ button_vars[switch_button].scene }}"
+      data: "{{ button_vars[switch_button].scene_on_data }}"
 
 mode: queued
 trace:
