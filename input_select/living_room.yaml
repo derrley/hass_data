@@ -1,0 +1,44 @@
+scene_indicator_living_room_main:
+  name: Scene Indicator Living Room Main
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_living_room_top_left:
+  name: Scene Indicator Living Room Top Left
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_living_room_top_right:
+  name: Scene Indicator Living Room Top Right
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_living_room_bottom_left:
+  name: Scene Indicator Living Room Bottom Left
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_living_room_bottom_right:
+  name: Scene Indicator Living Room Bottom Right
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White

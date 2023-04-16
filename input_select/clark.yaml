@@ -1,0 +1,44 @@
+scene_indicator_clark_main:
+  name: Scene Indicator Clark Main
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_clark_top_left:
+  name: Scene Indicator Clark Top Left
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_clark_top_right:
+  name: Scene Indicator Clark Top Right
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_clark_bottom_left:
+  name: Scene Indicator Clark Bottom Left
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_clark_bottom_right:
+  name: Scene Indicator Clark Bottom Right
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White

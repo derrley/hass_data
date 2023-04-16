@@ -1,0 +1,44 @@
+scene_indicator_front_main:
+  name: Scene Indicator Front Main
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_front_top_left:
+  name: Scene Indicator Front Top Left
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_front_top_right:
+  name: Scene Indicator Front Top Right
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_front_bottom_left:
+  name: Scene Indicator Front Bottom Left
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_front_bottom_right:
+  name: Scene Indicator Front Bottom Right
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White

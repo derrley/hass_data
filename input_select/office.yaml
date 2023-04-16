@@ -1,0 +1,44 @@
+scene_indicator_office_main:
+  name: Scene Indicator Office Main
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_office_top_left:
+  name: Scene Indicator Office Top Left
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_office_top_right:
+  name: Scene Indicator Office Top Right
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_office_bottom_left:
+  name: Scene Indicator Office Bottom Left
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_office_bottom_right:
+  name: Scene Indicator Office Bottom Right
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White

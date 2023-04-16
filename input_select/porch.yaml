@@ -1,0 +1,44 @@
+scene_indicator_porch_main:
+  name: Scene Indicator Porch Main
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_porch_top_left:
+  name: Scene Indicator Porch Top Left
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_porch_top_right:
+  name: Scene Indicator Porch Top Right
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_porch_bottom_left:
+  name: Scene Indicator Porch Bottom Left
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_porch_bottom_right:
+  name: Scene Indicator Porch Bottom Right
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
