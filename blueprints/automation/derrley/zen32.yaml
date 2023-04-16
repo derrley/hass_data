@@ -1,5 +1,26 @@
 blueprint:
   name: ZEN32
+  description: |
+    Link your ZEN32 Scene Controller to specific lights, light groups, and
+    scenes.
+
+    Link a light to a button, and the button will control it. Its LED will
+    reflect the status of the light (red means off, green means on, blue means
+    dimmed more than half way). In order to control indicators, provide
+    input_select entities that can mirror each indicator. (We do this so as not
+    to flood the zwave network with parameter updates.
+
+    If you'd like to link multiple lights, use a group. This automation
+    triggers on light state change, so groups are required to aggregate
+    specific light state changes together into a single trigger (otherwise
+    it'll trigger far too often).
+
+    Link a scene to each button as well. Triple-tap on the button will trigger
+    the scene.
+
+    Lastly, link a zooz rocker. Double-tap will change the dim of the light in
+    the main group.
+
   domain: automation
   input:
     switch:
@@ -9,49 +30,67 @@ blueprint:
           integration: zwave_js
           manufacturer: Zooz
           model: ZEN32
-    dimmer:
-      name: Dimmer Scene Source
-      default: []
-      selector:
-        device:
-          integration: zwave_js
-          manufacturer: Zooz
 
-    main_entities:
-      name: Lights Linked To Main Button
+    main_light:
+      name: Light Linked To Main Button
       default: []
       selector:
         entity:
           domain: light
-          multiple: true
-    top_left_entities:
+    main_indicator:
+      name: Input Select Linked To Main button
+      default: []
+      selector:
+        entity:
+          domain: input_select
+    top_left_light:
       name: Lights Linked To Top Left Button
       default: []
       selector:
         entity:
           domain: light
-          multiple: true
-    top_right_entities:
+    top_left_indicator:
+      name: Input Select Linked To Top Left button
+      default: []
+      selector:
+        entity:
+          domain: input_select
+    top_right_light:
       name: Lights Linked To Top Right Button
       default: []
       selector:
         entity:
           domain: light
-          multiple: true
-    bottom_left_entities:
+    top_right_indicator:
+      name: Input Select Linked To Top Right Button
+      default: []
+      selector:
+        entity:
+          domain: input_select
+    bottom_left_light:
       name: Lights Linked To Bottom Left Button
       default: []
       selector:
         entity:
           domain: light
-          multiple: true
-    bottom_right_entities:
+    bottom_left_indicator:
+      name: Input Select Linked To Bottom Left Button
+      default: []
+      selector:
+        entity:
+          domain: input_select
+    bottom_right_light:
       name: Lights Linked To Bottom Right Button
       default: []
       selector:
         entity:
           domain: light
-          multiple: true
+    bottom_right_indicator:
+      name: Input Select Linked To Bottom Right Button
+      default: []
+      selector:
+        entity:
+          domain: input_select
 
     top_left_scene:
       name: Scene Linked To Top Left Button
@@ -59,7 +98,6 @@ blueprint:
       selector:
         entity:
           domain: scene
-          multiple: false
 
     top_right_scene:
       name: Scene Linked To Top Right Button
@@ -67,7 +105,6 @@ blueprint:
       selector:
         entity:
           domain: scene
-          multiple: false
 
     bottom_left_scene:
       name: Scene Linked To Bottom Left Button
@@ -75,7 +112,6 @@ blueprint:
       selector:
         entity:
           domain: scene
-          multiple: false
 
     bottom_right_scene:
       name: Scene Linked To Bottom Right Button
@@ -83,87 +119,96 @@ blueprint:
       selector:
         entity:
           domain: scene
-          multiple: false
 
 variables:
-  main_entities: !input main_entities
-  top_left_entities: !input top_left_entities
-  top_right_entities: !input top_right_entities
-  bottom_left_entities: !input bottom_left_entities
-  bottom_right_entities: !input bottom_right_entities
+  main_light: !input main_light
+  top_left_light: !input top_left_light
+  top_right_light: !input top_right_light
+  bottom_left_light: !input bottom_left_light
+  bottom_right_light: !input bottom_right_light
   switch: !input switch
-  dimmer: !input dimmer
 
   single_press: "{{ trigger.event.data.value == 'KeyPressed' if trigger.platform == 'event' else None}}"
   double_press: "{{ trigger.event.data.value == 'KeyPressed2x' if trigger.platform == 'event' else None}}"
   triple_press: "{{ trigger.event.data.value == 'KeyPressed3x' if trigger.platform == 'event' else None}}"
 
   switch_press: "{{ trigger.event.data.device_id == switch if trigger.platform == 'event' else None}}"
-  dimmer_press: "{{ trigger.event.data.device_id == dimmer if trigger.platform == 'event' else None}}"
+
+  input_select_changed: "{{ trigger.entity_id.startswith('input_select') if trigger.platform == 'state' }}"
 
   trigger_vars:
     main_state_change:
-      entities_on: "{{ main_entities | map('states') | select('eq', 'on') | list }}"
-      entities_dimmed: "{{ main_entities | map('state_attr', 'brightness') | reject('eq', None) | select('lt', 127) | list }}"
+      input_select: !input main_indicator
+    main_indicator_state_change:
       light_color_param: 6
     main_button_press:
-      entities: !input main_entities
-      entities_on: "{{ main_entities | map('states') | select('eq', 'on') | list }}"
+      light: !input main_light
     top_left_state_change:
-      entities_on: "{{ top_left_entities | map('states') | select('eq', 'on') | list }}"
-      entities_dimmed: "{{ top_left_entities | map('state_attr', 'brightness') | reject('eq', None) | select('lt', 127) | list }}"
+      input_select: !input top_left_indicator
+    top_left_indicator_state_change:
       light_color_param: 7
     top_left_button_press:
-      entities: !input top_left_entities
-      entities_on: "{{ top_left_entities | map('states') | select('eq', 'on') | list }}"
+      light: !input top_left_light
       scene: !input top_left_scene
     top_right_state_change:
-      entities_on: "{{ top_right_entities | map('states') | select('eq', 'on') | list }}"
-      entities_dimmed: "{{ top_right_entities | map('state_attr', 'brightness') | reject('eq', None) | select('lt', 127) | list }}"
+      input_select: !input top_right_indicator
+    top_right_indicator_state_change:
       light_color_param: 8
     top_right_button_press:
-      entities: !input top_right_entities
-      entities_on: "{{ top_right_entities | map('states') | select('eq', 'on') | list }}"
+      light: !input top_right_light
       scene: !input top_right_scene
     bottom_left_state_change:
-      entities_on: "{{ bottom_left_entities | map('states') | select('eq', 'on') | list }}"
-      entities_dimmed: "{{ bottom_left_entities | map('state_attr', 'brightness') | reject('eq', None) | select('lt', 127) | list }}"
+      input_select: !input bottom_left_indicator
+    bottom_left_indicator_state_change:
       light_color_param: 9
     bottom_left_button_press:
-      entities: !input bottom_left_entities
-      entities_on: "{{ bottom_left_entities | map('states') | select('eq', 'on') | list }}"
+      light: !input bottom_left_light
       scene: !input bottom_left_scene
     bottom_right_state_change:
-      entities_on: "{{ bottom_right_entities | map('states') | select('eq', 'on') | list }}"
-      entities_dimmed: "{{ bottom_right_entities | map('state_attr', 'brightness') | reject('eq', None) | select('lt', 127) | list }}"
+      input_select: !input bottom_right_indicator
+    bottom_right_indicator_state_change:
       light_color_param: 10
     bottom_right_button_press:
-      entities: !input bottom_right_entities
-      entities_on: "{{ bottom_right_entities | map('states') | select('eq', 'on') | list }}"
+      light: !input bottom_right_light
       scene: !input bottom_right_scene
     dim_up_button_press:
-      entities: "{{ main_entities | reject('is_state', 'off') | list }}"
+      light: !input main_light
       step: 10
     dim_down_button_press:
-      entities: "{{ main_entities | reject('is_state', 'off') | list }}"
+      light: !input main_light
       step: -10
 
 trigger:
   - id: main_state_change
     platform: state
-    entity_id: !input main_entities
+    entity_id: !input main_light
+  - id: main_indicator_state_change
+    platform: state
+    entity_id: !input main_indicator
   - id: top_left_state_change
     platform: state
-    entity_id: !input top_left_entities
+    entity_id: !input top_left_light
+  - id: top_left_indicator_state_change
+    platform: state
+    entity_id: !input top_left_indicator
   - id: top_right_state_change
     platform: state
-    entity_id: !input top_right_entities
+    entity_id: !input top_right_light
+  - id: top_right_indicator_state_change
+    platform: state
+    entity_id: !input top_right_indicator
   - id: bottom_left_state_change
     platform: state
-    entity_id: !input bottom_left_entities
+    entity_id: !input bottom_left_light
+  - id: bottom_left_indicator_state_change
+    platform: state
+    entity_id: !input bottom_left_indicator
   - id: bottom_right_state_change
     platform: state
-    entity_id: !input bottom_right_entities
+    entity_id: !input bottom_right_light
+  - id: bottom_right_indicator_state_change
+    platform: state
+    entity_id: !input bottom_right_indicator
 
   - id: main_button_press
     platform: event
@@ -196,44 +241,39 @@ trigger:
       device_id: !input switch
       property_key: "004"
 
-  - id: dim_up_button_press
-    platform: event
-    event_type: zwave_js_value_notification
-    event_data:
-      device_id: !input dimmer
-      property_key: "001"
-
-  - id: dim_down_button_press
-    platform: event
-    event_type: zwave_js_value_notification
-    event_data:
-      device_id: !input dimmer
-      property_key: "002"
-
 condition: []
 action:
 - choose:
 
-  - conditions: "{{ trigger.platform == 'state' }}"
+  - conditions: "{{ trigger.platform == 'state' and input_select_changed }}"
     sequence:
     - service: zwave_js.set_config_parameter
-      data:
-        parameter: "{{ trigger_vars[trigger.id].light_color_param }}"
-        value: "{{ iif(trigger_vars[trigger.id].entities_on, iif(trigger_vars[trigger.id].entities_dimmed, 'Blue', 'Green'), 'Red') }}"
       target:
         device_id: !input switch
+      data:
+        parameter: "{{ trigger_vars[trigger.id].light_color_param }}"
+        value: "{{ trigger.to_state.state }}"
+
+  - conditions: "{{ trigger.platform == 'state' }}"
+    sequence:
+    - service: input_select.select_option
+      target:
+        entity_id: "{{ trigger_vars[trigger.id].input_select }}"
+      data:
+        option: "{{ 'Red' if states(trigger.entity_id) == 'off' else 'Blue' if (state_attr(trigger.entity_id, 'brightness') or 255) < 127 else 'Green' }}"
+
 
   - conditions: "{{ switch_press and single_press }}"
     sequence:
-    - service: "{{ iif(trigger_vars[trigger.id].entities_on, 'light.turn_off', 'light.turn_on') }}"
+    - service: light.toggle
       target:
-        entity_id: "{{ trigger_vars[trigger.id].entities }}"
+        entity_id: "{{ trigger_vars[trigger.id].light }}"
 
   - conditions: "{{ switch_press and double_press }}"
     sequence:
     - service: light.turn_on
       target:
-        entity_id: "{{ trigger_vars[trigger.id].entities }}"
+        entity_id: "{{ trigger_vars[trigger.id].light }}"
       data:
         brightness: 255
 
@@ -243,13 +283,6 @@ action:
       target:
         entity_id: "{{ trigger_vars[trigger.id].scene }}"
 
-  - conditions: "{{ dimmer_press and double_press }}"
-    sequence:
-    - service: light.turn_on
-      target:
-        entity_id: "{{ trigger_vars[trigger.id].entities }}"
-      data:
-        brightness_step_pct: "{{ trigger_vars[trigger.id].step }}"
-
-
 mode: queued
+trace:
+  stored_traces: 20
