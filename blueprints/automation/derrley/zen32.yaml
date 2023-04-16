@@ -1,5 +1,5 @@
 blueprint:
-  name: ZEN32 TESTING
+  name: ZEN32
   description: |
     Link your ZEN32 Scene Controller to light groups and scenes.
 
@@ -98,7 +98,6 @@ variables:
 
   single_press: "{{ trigger.event.data.value == 'KeyPressed' if trigger.platform == 'event' else None}}"
   double_press: "{{ trigger.event.data.value == 'KeyPressed2x' if trigger.platform == 'event' else None}}"
-  triple_press: "{{ trigger.event.data.value == 'KeyPressed3x' if trigger.platform == 'event' else None}}"
 
   switch_press: "{{ trigger.event.data.device_id == switch if trigger.platform == 'event' else None}}"
   switch_button: "{{ trigger.event.data.property_key if trigger.platform == 'event' else None}}"
@@ -167,7 +166,7 @@ trigger:
     platform: state
     entity_id: !input bottom_right_indicator
 
-  - id: main_button_press
+  - id: switch_button_press
     platform: event
     event_type: zwave_js_value_notification
     event_data:
@@ -185,6 +184,8 @@ action:
       data:
         parameter: "{{ trigger_vars[trigger.id].light_color_param }}"
         value: "{{ trigger.to_state.state }}"
+    - delay:
+        milliseconds: 100
 
   - conditions: "{{ trigger.platform == 'state' }}"
     sequence:
@@ -207,16 +208,11 @@ action:
     - service: light.toggle
       target:
         entity_id: "{{ button_vars[switch_button].light }}"
-
-  - conditions: "{{ switch_press and double_press }}"
-    sequence:
-    - service: light.turn_on
-      target:
-        entity_id: "{{ button_vars[switch_button].light }}"
       data:
         brightness: 255
+        color_temp_kelvin: 2900
 
-  - conditions: "{{ switch_press and triple_press }}"
+  - conditions: "{{ switch_press and double_press }}"
     sequence:
     - service: scene.turn_on
       target:
