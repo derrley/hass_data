@@ -11,13 +11,8 @@ blueprint:
     switch:
       name: Dimmer
       selector:
-        filter:
-        - integration: zwave_js
-          manufacturer: Zooz
-          model: ZEN72
-        - integration: zwave_js
-          manufacturer: Zooz
-          model: ZEN77
+        entity:
+          domain: light
 
     light:
       name: Smart Light
