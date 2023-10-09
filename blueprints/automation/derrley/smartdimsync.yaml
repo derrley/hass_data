@@ -38,7 +38,7 @@ condition: []
 action:
 - choose:
 
-  - conditions: "{{ trigger.to_state.is_on }}"
+  - conditions: "{{ trigger.to_state.state == 'on' }}"
     sequence:
     - service: light.turn_on
       target:
@@ -46,7 +46,7 @@ action:
       data:
         brightness: "{{ trigger.to_state.brightness }}"
 
-  - conditions: "{{ not trigger.to_state.is_on }}"
+  - conditions: "{{ trigger.to_state.state == 'off' }}"
     sequence:
     - service: light.turn_off
       target:
