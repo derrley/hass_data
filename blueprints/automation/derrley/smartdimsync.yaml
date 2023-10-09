@@ -44,7 +44,7 @@ action:
       target:
         device_id: "{{ light }}"
       data:
-        brightness: "{{ trigger.to_state.brightness }}"
+        brightness: "{{ trigger.to_state.attributes.brightness }}"
 
   - conditions: "{{ trigger.to_state.state == 'off' }}"
     sequence:
