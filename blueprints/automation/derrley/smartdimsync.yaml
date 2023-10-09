@@ -42,7 +42,7 @@ action:
     sequence:
     - service: light.turn_on
       target:
-        device_id: "{{ light }}"
+        entity_id: "{{ light }}"
       data:
         brightness: "{{ trigger.to_state.attributes.brightness }}"
 
