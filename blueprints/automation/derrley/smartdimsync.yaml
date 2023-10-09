@@ -14,7 +14,9 @@ blueprint:
         device:
           integration: zwave_js
           manufacturer: Zooz
-          model: ZEN72
+          model:
+          - ZEN72
+          - ZEN77
 
     light:
       name: Smart Light
