@@ -1,0 +1,63 @@
+blueprint:
+  name: Smart Dim Sync
+  description: |
+    Link a dimmer (in smart switch mode, with its relay disabled) to a smart
+    bulb. Synchronize the smart bulb's brightness based on the brightness of
+    the dimmer, and visa versa (for when the smart bulb is changed through
+    another mechanism, like directly in the home assistant app).
+
+  domain: automation
+  input:
+    switch:
+      name: Dimmer
+      selector:
+        device:
+          integration: zwave_js
+          manufacturer: Zooz
+          model: ZEN72
+
+    light:
+      name: Smart Light
+      selector:
+        entity:
+          domain: light
+
+variables:
+  switch: !input switch
+  light: !input light
+
+  entity_to_sync: "{{ light if trigger.id == 'switch_state_change' else switch }}"
+
+trigger:
+  - id: light_state_change
+    platform: state
+    entity_id: !input light
+  - id: switch_state_change
+    platform: state
+    entity_id: !input switch
+
+condition: []
+action:
+- choose:
+
+  - conditions: "{{ trigger.to_state.is_on }}"
+    sequence:
+    - service: light.turn_on
+      target:
+        device_id: "{{ entity_to_sync }}"
+      data:
+        brightness: "{{ trigger.to_state.brightness }}"
+
+  - conditions: "{{ not trigger.to_state.is_on }}"
+    sequence:
+    - service: light.turn_off
+      target:
+        entity_id: "{{ entity_to_sync }}"
+
+      data: {}
+
+max: 25
+mode: queued
+trace:
+  stored_traces: 20
+
