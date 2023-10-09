@@ -1,0 +1,44 @@
+scene_indicator_master_bath_main:
+  name: Scene Indicator Master Bath Main
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_master_bath_top_left:
+  name: Scene Indicator Master Bath Top Left
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_master_bath_top_right:
+  name: Scene Indicator Master Bath Top Right
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_master_bath_bottom_left:
+  name: Scene Indicator Master Bath Bottom Left
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_master_bath_bottom_right:
+  name: Scene Indicator Master Bath Bottom Right
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White

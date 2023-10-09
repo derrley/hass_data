@@ -1,0 +1,44 @@
+scene_indicator_kitchen_main:
+  name: Scene Indicator Kitchen Main
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_kitchen_top_left:
+  name: Scene Indicator Kitchen Top Left
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_kitchen_top_right:
+  name: Scene Indicator Kitchen Top Right
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_kitchen_bottom_left:
+  name: Scene Indicator Kitchen Bottom Left
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
+
+scene_indicator_kitchen_bottom_right:
+  name: Scene Indicator Kitchen Bottom Right
+  options:
+    - Red
+    - Blue
+    - Green
+    - White
+  initial: White
