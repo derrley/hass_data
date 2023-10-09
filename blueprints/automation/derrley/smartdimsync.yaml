@@ -25,7 +25,7 @@ variables:
   light: !input light
 
   entity_to_sync: "{{ light if trigger.id == 'switch_state_change' else switch }}"
-  entity_to_sync_recently_changed: "{{ utcnow() - states[entity_to_sync].last_updated > timedelta(minutes=5) }}"
+  entity_to_sync_recently_changed: "{{ utcnow() - states[entity_to_sync].last_updated < timedelta(minutes=5) }}"
 
 trigger:
   - id: light_state_change
