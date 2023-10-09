@@ -42,7 +42,7 @@ action:
     sequence:
     - service: light.turn_on
       target:
-        device_id: "{{ entity_to_sync }}"
+        device_id: "{{ light }}"
       data:
         brightness: "{{ trigger.to_state.brightness }}"
 
@@ -50,7 +50,7 @@ action:
     sequence:
     - service: light.turn_off
       target:
-        entity_id: "{{ entity_to_sync }}"
+        entity_id: "{{ light }}"
 
       data: {}
 
