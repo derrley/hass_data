@@ -7,22 +7,29 @@ blueprint:
   domain: script
   input:
     light:
-      name: Light to dim
+      name: Light
+      description: Which light should we dim?
       selector:
         entity:
           domain: light
 
+
 mode: restart
 
+fields:
+  direction:
+    name: Direction
+    description: Which direction should we dim? -1 for down, 1 for up.
+    default: -1
+      
 variables:
   light: !input light
   starting_brightness: "{{ state_attr(light, 'brightness') or 0 }}"
-  # Change by 2 percent, because it 
-  increment: "{{ -5.0 if states(light) == 'on' else 5.0 }}"
+  # Change by 2 percent per increment.
+  increment: "{{ 5.0 * direction }}" 
   # There are 50 2 percent changes in 100 percent.
   count: 50
-  # 100ms delay means 5 seconds to fully dim. That's what the zooz dimmers
-  # default to, and seems to be a good places to start.
+  # 100ms delay means 5 seconds to fully dim over 2% intervals.
   delay_ms: 100
 
 sequence:

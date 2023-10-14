@@ -11,8 +11,9 @@ blueprint:
     switch:
       name: Dimmer
       selector:
-        entity:
-          domain: light
+        device:
+          integration: zwave_js
+          manufacturer: Zooz
 
     light:
       name: Smart Light
@@ -20,43 +21,69 @@ blueprint:
         entity:
           domain: light
 
+    dimscript:
+      name: Dim Script
+      selector:
+        entity:
+          domain: script
+
 variables:
   switch: !input switch
   light: !input light
 
-  entity_to_sync: "{{ light if trigger.id == 'switch_state_change' else switch }}"
-  entity_to_sync_recently_changed: "{{ utcnow() - states[entity_to_sync].last_updated < timedelta(minutes=5) }}"
+  top_pressed: "{{ trigger.event.data.property_key == '001' }}"
+  bottom_pressed: "{{ trigger.event.data.property_key == '002' }}"
+  button_pressed: "{{ trigger.event.data.value_raw == 0 }}"
+  button_released: "{{ trigger.event.data.value_raw == 1 }}"
+  button_held: "{{ trigger.event.data.value_raw == 2 }}"
+  button_double_pressed: "{{ trigger.event.data.value_raw == 3 }}"
+
+  dim_direction: "{{ 1 if top_pressed else -1 }}"
+  toggle_service: "{{ 'light.turn_on' if top_pressed else 'light.turn_off' }}"
 
 trigger:
-  - id: light_state_change
-    platform: state
-    entity_id: !input light
-  - id: switch_state_change
-    platform: state
-    entity_id: !input switch
+  - id: switch_press
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      device_id: !input switch
 
 condition: []
 action:
 - choose:
 
-  - conditions: "{{ trigger.to_state.state == 'on' and not (trigger.id == 'light_state_change' and entity_to_sync_recently_changed) }}"
+  - conditions: "{{ button_pressed }}" 
+    sequence:
+    - service: "{{ toggle_service }}"
+      target:
+        entity_id: !input light
+      data: {}
+
+  - conditions: "{{ button_double_pressed and top_pressed }}" 
     sequence:
     - service: light.turn_on
       target:
-        entity_id: "{{ entity_to_sync }}"
+        entity_id: !input light
       data:
-        brightness: "{{ trigger.to_state.attributes.brightness }}"
+        brightness: 255
 
-  - conditions: "{{ trigger.to_state.state == 'off' }}"
+  - conditions: "{{ button_held }}"
     sequence:
-    - service: light.turn_off
+    - service: script.turn_on
       target:
-        entity_id: "{{ entity_to_sync }}"
+        entity_id: !input dimscript
+      data:
+        variables:
+          direction: "{{ dim_direction }}"
 
+  - conditions: "{{ button_released }}"
+    sequence:
+    - service: script.turn_off
+      target:
+        entity_id: !input dimscript
       data: {}
 
 max: 25
 mode: queued
 trace:
   stored_traces: 20
-
