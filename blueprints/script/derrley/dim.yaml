@@ -46,7 +46,7 @@ sequence:
             brightness: "{{ max(1, starting_brightness + (repeat.index * increment)) }}"
             color_temp_kelvin: >
                 {% macro warm_dim_brightness(brightness) %}
-                {{ 2240 + (4.5 * brightness) + (-0.00485 * (brightness**2))  }}
+                {{ 2259 + (3.8 * brightness) + (-0.00385 * (brightness**2))  }}
                 {% endmacro %}
                 {{ warm_dim_brightness(max(1, starting_brightness + (repeat.index * increment))) }}
         - delay:
