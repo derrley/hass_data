@@ -1,0 +1,148 @@
+blueprint:
+  name: ZEN37
+  description: |
+    Link your ZEN37 Remote to light groups and scenes.
+ 
+    Link two light / light groups. The big two buttons will control one of them
+    while the small two will control the other. Click once for on / off. Click
+    and hold for dim up / down. (To support dimming, this is used in concert
+    with a dim script.)
+
+    Link two scenes as well. Double-tap the "on" will turn the light to max.
+    Double tap the "off" with activate the scene.
+
+  domain: automation
+  input:
+    switch:
+      name: Scene Controller
+      selector:
+        device:
+          integration: zwave_js
+          manufacturer: Zooz
+          model: ZEN37 800LR
+
+    main_light:
+      name: Light Linked To Big Buttons
+      default: []
+      selector:
+        entity:
+          domain: light
+
+    main_scene:
+      name: Scene Linked To Big Buttons
+      default: []
+      selector:
+        entity:
+          domain: scene
+
+    main_dimscript:
+      name: Dim Script Linked to Big Buttons
+      selector:
+        entity:
+          domain: script
+
+    small_light:
+      name: Light Linked To Small Buttons
+      default: []
+      selector:
+        entity:
+          domain: light
+
+    small_scene:
+      name: Scene Linked To Small Buttons
+      default: []
+      selector:
+        entity:
+          domain: scene
+
+    small_dimscript:
+      name: Dim Script Linked to Small Buttons
+      selector:
+        entity:
+          domain: script
+
+variables:
+  main_light: !input main_light
+  small_light: !input small_light
+  main_scene: !input main_scene
+  small_scene: !input small_scene
+  main_dimscript: !input main_dimscript
+  small_dimscript: !input small_dimscript
+  switch: !input switch
+
+  # Was this switch in question pressed at all
+  switch_press: "{{ trigger.event.data.device_id == switch if trigger.platform == 'event' else None }}"
+
+  # Which of the four buttons was pressed?
+  big_on: "{{ trigger.event.data.property_key == '001' }}"
+  big_off: "{{ trigger.event.data.property_key == '002' }}"
+  small_on: "{{ trigger.event.data.property_key == '004' }}"
+  small_off: "{{ trigger.event.data.property_key == '003' }}"
+
+  # How was it pressed?
+  button_pressed: "{{ trigger.event.data.value_raw == 0 }}"
+  button_released: "{{ trigger.event.data.value_raw == 1 }}"
+  button_held: "{{ trigger.event.data.value_raw == 2 }}"
+  button_double_pressed: "{{ trigger.event.data.value_raw == 3 }}"
+
+  light: "{{ main_light if big_on or big_off else small_light }}"
+  dimscript: "{{ main_dimscript if big_on or big_off else small_dimscript }}"
+  scene: "{{ main_scene if big_on or big_off else small_scene }}"
+  turn_on: "{{ big_on or small_on }}"
+  dim_direction: "{{ 1 if turn_on else -1 }}"
+  toggle_service: "{{ 'light.turn_on' if turn_on else 'light.turn_off' }}"
+
+trigger:
+  - id: switch_button_press
+    platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      device_id: !input switch
+
+condition: []
+action:
+- choose:
+
+  - conditions: "{{ button_pressed }}" 
+    sequence:
+    - service: "{{ toggle_service }}"
+      target:
+        entity_id: "{{ light }}"
+      data: {}
+
+  - conditions: "{{ button_double_pressed and turn_on }}" 
+    sequence:
+    - service: light.turn_on
+      target:
+        entity_id: "{{ light }}"
+      data:
+        brightness: 255
+        color_temp_kelvin: 3150
+
+  - conditions: "{{ button_held }}"
+    sequence:
+    - service: script.turn_on
+      target:
+        entity_id: "{{ dimscript }}"
+      data:
+        variables:
+          direction: "{{ dim_direction }}"
+
+  - conditions: "{{ button_released }}"
+    sequence:
+    - service: script.turn_off
+      target:
+        entity_id: "{{ dimscript }}"
+      data: {}
+
+  - conditions: "{{ button_double_pressed and not turn_on }}"
+    sequence:
+    - service: homeassistant.turn_on
+      target:
+        entity_id: "{{ scene }}"
+      data: {}
+
+max: 25
+mode: queued
+trace:
+  stored_traces: 20
