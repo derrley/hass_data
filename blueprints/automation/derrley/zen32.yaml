@@ -104,7 +104,7 @@ variables:
 
   light_on_data:
     brightness: 255
-    color_temp_kelvin: 2900
+    color_temp_kelvin: 3150
 
   input_select_changed: "{{ trigger.entity_id.startswith('input_select') if trigger.platform == 'state' }}"
 

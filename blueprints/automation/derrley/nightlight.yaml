@@ -1,0 +1,76 @@
+blueprint:
+  name: Night Light
+  description: |
+    Automatically turn specific lights to a night time setting.
+
+  domain: automation
+  input:
+    light:
+      name: Smart Light
+      selector:
+        entity:
+          domain: light
+          multiple: true
+
+variables:
+  light: !input light
+
+  light_args:
+    brightness: 25
+    rgbw_color: [80, 40, 0, 0]
+    
+  within: "{{ states('sun.sun') == 'below_horizon' }}"
+
+trigger:
+  - id: state_change
+    platform: state
+    entity_id: !input light
+    to: 'off'
+
+  - id: start
+    platform: sun
+    event: sunset
+
+  - id: end
+    platform: sun
+    event: sunrise
+
+condition: []
+action:
+- choose:
+
+  - conditions: "{{ trigger.id == 'state_change' and within }}" 
+    sequence:
+    - service: light.turn_on
+      target:
+        entity_id: "{{ trigger.entity_id }}"
+      data: "{{ light_args }}"
+
+  - conditions: "{{ trigger.id == 'start' }}" 
+    sequence:
+    - repeat:
+        for_each: "{{ light }}"
+        sequence:
+        - if: "{{ states(repeat.item) == 'off' }}"
+          then:
+          - service: light.turn_on
+            target:
+              entity_id: "{{ repeat.item }}"
+            data: "{{ light_args }}"
+
+  - conditions: "{{ trigger.id == 'end' }}" 
+    sequence:
+    - repeat:
+        for_each: "{{ light }}"
+        sequence:
+        - if: "{{ states(repeat.item) == 'on' and state_attr(repeat.item, 'rgbw_color') == light_args.rgbw_color }}"
+          then:
+          - service: light.turn_off
+            target:
+              entity_id: "{{ repeat.item }}"
+            data: {}
+
+max: 25
+mode: queued
+trace:
+  stored_traces: 20
